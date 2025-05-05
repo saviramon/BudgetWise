@@ -3,6 +3,7 @@ from bson.objectid import ObjectId
 import os
 from tabulate import tabulate
 import time
+import csv
 
 
 # Displays title of application in ASCII Artstyle 
@@ -33,6 +34,7 @@ def main_menu():
     print("2. View your budget")
     print("3. Create your budget goals")    
     print("4. Exit")
+
 # Displays the transaction management menu
 def transaction_management_menu():
     """
@@ -43,7 +45,9 @@ def transaction_management_menu():
     print("1. Add a transaction")
     print("2. Delete a transaction")
     print("3. Edit transactions")
-    print("4. Back to main menu")
+    print("4. Export transactions")
+    print("5. Back to main menu")
+
 # Displays the budget goals menu
 def budget_goals_menu():
     """
@@ -54,6 +58,7 @@ def budget_goals_menu():
     print("2. Update a budget goal")
     print("3. Delete a budget goal")
     print("4. Back to main menu")
+
 # adds transactions to the database
 def add_transaction():
     """
@@ -78,6 +83,7 @@ def add_transaction():
 
     result = transactions.insert_one(transaction)
     print(f"Transaction saved with ID: {result.inserted_id}\n")
+
 # edits transactions in the database
 def edit_transactions():
     """
@@ -135,6 +141,7 @@ def edit_transactions():
                 print("Your transaction were updated.\n")
             else:
                 print("No changes were made.\n")
+
 # deletes transactions in the database
 def delete_transaction():
     """
@@ -156,13 +163,22 @@ def delete_transaction():
 
         for transaction in transactions.find():
             if str(transaction['_id']) == transaction_id:
-                transactions.delete_one({'_id': transaction['_id']})
-                print("Transaction deleted.")
-                clear_screen()
-                return
+                confirm = input("Are you sure you want to delete this transaction? (Doing so will permanently delete it.) (y/n): ").strip().lower()
+                if confirm == 'y':
+                    transactions.delete_one({'_id': transaction['_id']})
+                    print("Transaction successfully deleted.")
+                    time.sleep(2)
+                    clear_screen()
+                    return
+                else:
+                    print("Deletion cancelled.")
+                    time.sleep(2)
+                    clear_screen()
+                    return
 
         print("Transaction ID not found. Please try again. Page will auto refresh in 5 seconds.")
         time.sleep(5)
+
 # display transactions in a table format
 def view_transactions():
     db = get_db()
@@ -184,6 +200,7 @@ def view_transactions():
 
     print("\n--- Transactions ---")
     print(tabulate(table, headers=headers, tablefmt="fancy_grid"))
+
 # Displays a brief budget overview
 def view_budget():
     """
@@ -201,7 +218,8 @@ def view_budget():
             expenses += amount
     print(f"\nTotal Income: ${income:.2f}")
     print(f"Total Expenses: ${expenses:.2f}")
-    print(f"Net: ${income + expenses:.2f}")
+    print(f"Net Spending: ${income + expenses:.2f}")
+
 # Creates a budget goal in the database
 def create_budget_goal():
     """
@@ -221,6 +239,7 @@ def create_budget_goal():
     }
 
     budget_goals.insert_one(budget_goal)
+
 # Displays the budget goals in a table format
 def view_budget_goals():
     """
@@ -242,6 +261,7 @@ def view_budget_goals():
         ]
         table.append(row)
     print(tabulate(table, headers=headers, tablefmt="fancy_grid"))
+
 # Updates a budget goal in the database
 def update_budget_goal():
     """
@@ -291,6 +311,7 @@ def update_budget_goal():
                 print("Your budget goal was successfully updated.")
             else:
                 print("No changes were made to your Goals.")
+
 # Deletes a budget goal in the database
 def delete_budget_goal():
     """
@@ -311,13 +332,45 @@ def delete_budget_goal():
 
         for goal in budget_goals.find():
             if str(goal['_id']) == goal_id:
-                budget_goals.delete_one({'_id': goal['_id']})
-                print("Budget goal successfully deleted.")
-                time.sleep(2)
-                return
+                confirm = input("Are you sure you want to delete this goal? (Doing so will delete all progress.) (y/n): ").strip().lower()
+                if confirm == 'y':
+                    print("Budget goal successfully deleted.")
+                    time.sleep(2)
+                    budget_goals.delete_one({'_id': goal['_id']})
+                    return
+                else:
+                    print("Deletion cancelled.")
+                    time.sleep(2)
+                    break
         
         print("Budget goal ID not found. Please try again. Page is refreshing...")
         time.sleep(2)
+
+def export_transactions():
+    """
+    Function to export transactions to a CSV file.
+    """
+    db = get_db()
+    transactions = db.transactions.find()
+
+    with open('transactions.csv', 'w', newline='') as csvfile:
+        headers = ['Transaction ID', 'Date', 'Type', 'Description', 'Category', 'Amount']
+        writer = csv.DictWriter(csvfile, fieldnames=headers)
+
+        writer.writeheader()
+        for transaction in transactions:
+            writer.writerow({
+                'Transaction ID': str(transaction['_id']),
+                'Date': transaction['date'],
+                'Type': transaction['type'],
+                'Description': transaction['description'],
+                'Category': transaction['category'],
+                'Amount': transaction['amount']
+            })
+
+    print("Transactions were exported to transactions.csv.")
+    print("Returning to Transaction Management Menu...")
+    time.sleep(3)
 
 # This is the main program loop that will run until the user chooses to exit.
 while True:
@@ -328,8 +381,8 @@ while True:
     choice = input("\nEnter a number between 1 and 4: ")
 
     if choice == '1':
-        clear_screen()
         while True:
+            clear_screen()
             view_transactions()
             transaction_management_menu()
 
@@ -344,6 +397,8 @@ while True:
                 print("--Edit Transactions--")
                 edit_transactions()
             elif choice == '4':
+                export_transactions()
+            elif choice == '5':
                 break
             else:
                 print("Invalid choice, choose a number between 1-4.")

@@ -15,6 +15,9 @@ https://www.mongodb.com/docs/languages/python/pymongo-driver/current/data-format
 **Tabulate module**
 https://www.geeksforgeeks.org/introduction-to-python-tabulate-library/
 
+**Pyhton CSV module: used to export transactions**
+https://docs.python.org/3/library/csv.html
+
 ### BudgetWise - Personal Budget Management App (More to come in the future)
 BudgetWise is a command-line application designed to help users manage their personal budget by tracking income, expenses, and setting budget goals. This app allows users to add, delete, and view transactions, as well as set and monitor budget goals for various categories. All data is stored securely in a MongoDB database.
 

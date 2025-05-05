@@ -406,7 +406,7 @@ while True:
         clear_screen()
         print("---Budget Overview---")
         while True:
-            choice = input("Do you want to view your transactions or go back to the main menu (y/n/go back)? ").lower()
+            choice = input("Do you want to view your transactions or exit to the main menu (y/n/exit)? ").lower()
             if choice == 'y':
                 view_transactions()
                 view_budget()

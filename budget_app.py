@@ -26,6 +26,8 @@ def main_menu():
     Returns the user's choice as an integer.
     """
     print("Welcome to BudgetWise your personal budget app!\n")
+    print("Take control of your finances!")
+    print("Record your transactions, view your budget, and set goals.\n")
     print("Please select an option:")
     print("1. Manage your transactions")
     print("2. View your budget")

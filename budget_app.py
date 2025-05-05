@@ -5,7 +5,7 @@ from tabulate import tabulate
 import time
 
 
-# Text to ASCII Art Generator (https://patorjk.com/software/taag/#p=display&h=1&v=0&f=Slant&t=BudgetWise)
+# Displays title of application in ASCII Artstyle 
 def title():
     """
     Displays the title of the application.

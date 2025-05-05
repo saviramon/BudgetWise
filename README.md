@@ -2,6 +2,12 @@
 
 ### Some resouces I used to create this project:
 
+**ASCII Art Generator**
+https://patorjk.com/software/taag/#p=display&h=1&v=0&f=Slant&t=BudgetWise
+
+**MongoDB Driver Install and Connection Guide**
+https://cloud.mongodb.com/v2/6816f3e2b3b67278d79550b2#/overview?connectCluster=Cluster0
+
 **MongoDB "pymongo" module for python**
 https://www.mongodb.com/docs/languages/python/pymongo-driver/current/crud/
 https://www.mongodb.com/docs/languages/python/pymongo-driver/current/data-formats/bson/

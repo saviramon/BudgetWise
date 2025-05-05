@@ -4,7 +4,13 @@ from pymongo.server_api import ServerApi
 import os
 from dotenv import load_dotenv
 
-uri = "mongodb+srv://tejadax:Rz4KJYfjheqMXLAQ@cluster0.dkkfmqh.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+# Load environment variables from .env file
+load_dotenv()
+
+# Retrieve the MongoDB connection string from environment variables
+uri = os.getenv("MONGODB_URI")
+if uri is None:
+    raise ValueError("MONGODB_URI is not valid.")
 
 # Create a new client and connect to the server
 client = MongoClient(uri, server_api=ServerApi('1'))

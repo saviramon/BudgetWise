@@ -386,7 +386,7 @@ while True:
             view_transactions()
             transaction_management_menu()
 
-            choice = input("Enter a number between 1 and 4: ")
+            choice = input("Enter a number between 1 and 5: ")
             if choice == '1':
                 print("--Add Transaction--")
                 add_transaction()

@@ -312,7 +312,7 @@ def display_response(resp):
             ])
         print(tabulate(rows, headers=headers, tablefmt="fancy_grid"))
 
-# Calls the microservice to filter transactions based on user input
+# MicroserviceA - Calls the microservice to filter transactions based on user input
 def call_microserviceA(req):
     MICRO_URL = "tcp://localhost:5555"
     ctx  = zmq.Context()
@@ -533,17 +533,56 @@ def export_transactions():
     print("Returning to Transaction Management Menu...")
     time.sleep(3)
 
-# MicroserviceD - view total savings and display in a table format
-def view_savings():
-    context = zmq.Context()
-    socket = context.socket(zmq.REQ)
-    socket.connect("tcp://localhost:5552")
+# MicroserviceA - Calls the microservice to filter transactions based on user input
+def call_microserviceA(req):
+    MICRO_URL = "tcp://localhost:5555"
+    ctx  = zmq.Context()
+    sock = ctx.socket(zmq.REQ)
+    sock.connect(MICRO_URL)
+    sock.send_json(req)
+    resp = sock.recv_json()
+    print("Filtered Results:")
+    display_response(resp)
 
-    socket.send_string("get_total_savings")
-    reply = socket.recv_string()
+# Filters transactions by month, type, or ID
+def view_transactions_by_type():
+    while True:
+        clear_screen()
+        print("=== Quick Budget Summary ===")
+        view_budget()
+        print("\n=== All Transactions ===\n")
+        view_transactions()
+        print("\n--- Filter Transactions ---\n")
+        print("1) Filter by Month (YYYY-MM)")
+        print("2) Filter by Type (income/expense)")
+        print("3) Filter by Transaction ID")
+        print("4) Exit")
+        choice = input("Choose an option [1-4]: ").strip()
 
-    print(reply)
+        if choice == '4':
+            print("Returning to previous menu...")
+            break
+        if choice == '1':
+            month = input("Enter month (YYYY-MM): ").strip()
+            req = {"month": month}
+        elif choice == '2':
+            tx_type = input("Enter type (income/expense): ").strip().lower()
+            req = {"type": tx_type}
+        elif choice == '3':
+            txn_id = input("Enter Transaction ID: ").strip()
+            req = {"id": txn_id}
+        else:
+            print("Invalid choice.")
+            time.sleep(1)
+            continue
 
+        call_microserviceA(req)
+        again = input("\nPress Enter to filter again; any other button to exit ")
+        if again != "":
+            print("Goodbye!")
+            break
+
+# apply updates to recurring transactions
 def apply_recurring_transactions():
     """
     Function to apply recurring transactions.
@@ -558,6 +597,87 @@ def apply_recurring_transactions():
     # Wait for reply
     response = socket.recv_json()
     print("Response:", response)
+
+# MicroserviceB - adds a recurring transaction
+def add_recurring_transaction(description, amount, category, start_date, frequency):
+    """
+    Function to add a recurring transaction via the microservice.
+    """
+    context = zmq.Context()
+    socket = context.socket(zmq.REQ)
+    socket.connect("tcp://localhost:5557")
+
+    socket.send_json({
+        "command": "add_recurring",
+        "transaction": {
+            "description": description,
+            "amount": amount,
+            "category": category,
+            "recurrence": {
+                "frequency": frequency,
+                "next_due": start_date
+            }
+        }
+    })
+
+    res = socket.recv_json()
+    if res.get("status") == "ok":
+        applied_count = res.get("processed_count", 0)
+        print(f"Added recurring transactions. {applied_count} transaction(s) was applied.\n")
+    else:
+        print(f"Failed: {res.get('message')}\n")
+    print("Returning to Transaction Management Menu...")
+    time.sleep(5)
+
+# apply updates to recurring transactions
+def apply_recurring_transactions():
+    """
+    Function to apply recurring transactions.
+    """
+    context = zmq.Context()
+    socket = context.socket(zmq.REQ)
+    socket.connect("tcp://localhost:5557")  # Change if the server is on another machine
+
+    # Send command to apply recurring transactions
+    socket.send_json({"command": "apply_recurring"})
+
+    # Wait for reply
+    response = socket.recv_json()
+    print("Response:", response)
+
+# MicroserviceC - creates a graph of transactions
+def create_graph_microserviceC():
+    context = zmq.Context()
+    socket = context.socket(zmq.REQ)
+    socket.connect("tcp://localhost:5554")
+
+    # Send chart request
+    socket.send_string("generate_chart")
+
+    # Receive binary image data
+    data = socket.recv()
+    
+    # Check if it's a string error instead
+    if data.startswith(b"Error") or data.startswith(b"No data"):
+        print(data.decode())
+        return
+
+    # Load and show the image using PIL
+    image = Image.open(io.BytesIO(data))
+    image.show()  # Opens in default image viewer (or Preview/Photos)
+
+    print("Chart displayed.")
+
+# MicroserviceD - view total savings and display in a table format
+def view_savings():
+    context = zmq.Context()
+    socket = context.socket(zmq.REQ)
+    socket.connect("tcp://localhost:5552")
+
+    socket.send_string("get_total_savings")
+    reply = socket.recv_string()
+
+    print(reply)
 
 # This is the main program loop that will run until the user chooses to exit.
 while True:

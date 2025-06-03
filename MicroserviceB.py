@@ -17,7 +17,7 @@ client = MongoClient(uri)
 
 try:
     client.admin.command("ping")
-    print("Connected to MongoDB!")
+    print("Connected to MongoDB")
 except Exception as e:
     print(f"Failed to connect to MongoDB: {e}")
     exit(1)
@@ -102,7 +102,7 @@ def apply_recurring_transactions():
                     {"_id": doc["_id"]},
                     {"$set": {"recurrence.next_due": str(new_due_date)}}
                 )
-                print(f"Updated recurring transaction next_due, matched: {update_result.matched_count}, modified: {update_result.modified_count}")
+                print(f"Updated recurring transaction: {update_result.matched_count}, modified: {update_result.modified_count}")
             except Exception as e:
                 print(f"Failed to update recurring transaction: {e}")
 
@@ -113,7 +113,7 @@ def apply_recurring_transactions():
     return processed
 
 
-print("[Recurring Transaction Microservice] Running on port 5557")
+print("Microservice B Running on port 5557")
 while True:
     try:
         message = socket.recv_json()

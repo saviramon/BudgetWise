@@ -14,7 +14,7 @@ context = zmq.Context()
 socket = context.socket(zmq.REP)
 socket.bind("tcp://*:5554")
 
-print("Microservice running on port 5554...")
+print("Microservice C running on port 5554...")
 
 while True:
     print("Waiting for request...")

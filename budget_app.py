@@ -629,22 +629,6 @@ def add_recurring_transaction(description, amount, category, start_date, frequen
     print("Returning to Transaction Management Menu...")
     time.sleep(5)
 
-# apply updates to recurring transactions
-def apply_recurring_transactions():
-    """
-    Function to apply recurring transactions.
-    """
-    context = zmq.Context()
-    socket = context.socket(zmq.REQ)
-    socket.connect("tcp://localhost:5557")  # Change if the server is on another machine
-
-    # Send command to apply recurring transactions
-    socket.send_json({"command": "apply_recurring"})
-
-    # Wait for reply
-    response = socket.recv_json()
-    print("Response:", response)
-
 # MicroserviceC - creates a graph of transactions
 def create_graph_microserviceC():
     context = zmq.Context()
@@ -664,7 +648,7 @@ def create_graph_microserviceC():
 
     # Load and show the image using PIL
     image = Image.open(io.BytesIO(data))
-    image.show()  # Opens image once it is received
+    image.show()  # Opens the image
 
 # MicroserviceD - view total savings and display in a table format
 def view_savings():

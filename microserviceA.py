@@ -47,7 +47,7 @@ ZMQ_ADDR = "tcp://0.0.0.0:5555"
 ctx = zmq.Context()
 socket = ctx.socket(zmq.REP)
 socket.bind(ZMQ_ADDR)
-print(f"[Microservice] Listening on {ZMQ_ADDR}...")
+print(f"Microservice A Listening on {ZMQ_ADDR}...")
 
 while True:
     try:

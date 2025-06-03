@@ -62,9 +62,8 @@ def main():
             socket.send_string("Unknown command")
 
 try:
-    # Test MongoDB connection on start
     client.admin.command('ping')
-    print("Pinged your deployment. You successfully connected to MongoDB!")
+    print("Connected to MongoDB")
     main()
 except Exception as e:
     print(f"Failed to connect to MongoDB: {e}")

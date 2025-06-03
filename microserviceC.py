@@ -27,7 +27,7 @@ while True:
 
     pipeline = [{"$group": {"_id": "$type", "total": {"$sum": "$amount"}}}]
     results = list(transactions.aggregate(pipeline))
-    print("Aggregation results:", results)
+    print("Bar chart results:", results)
 
     if not results:
         socket.send_string("No data found to generate chart.")

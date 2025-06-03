@@ -14,13 +14,6 @@ if uri is None:
 
 client = MongoClient(uri, server_api=ServerApi('1'))
 
-try:
-    # Test MongoDB connection on start
-    client.admin.command('ping')
-    print("Connected to MongoDB")
-except Exception as e:
-    print(f"Failed to connect to MongoDB: {e}")
-
 def get_db():
     return client["budgetwise_db"]
 
@@ -56,7 +49,7 @@ def main():
     socket = context.socket(zmq.REP)
     socket.bind("tcp://*:5552")
 
-    print("MicroserviceD running on tcp://*:5552")
+    print("Savings microservice running on tcp://*:5552")
 
     while True:
         message = socket.recv_string()
@@ -66,5 +59,12 @@ def main():
             report = calculate_total_savings()
             socket.send_string(report)
         else:
-            socket.send_string("Unknown")
+            socket.send_string("Unknown command")
 
+try:
+    # Test MongoDB connection on start
+    client.admin.command('ping')
+    print("Pinged your deployment. You successfully connected to MongoDB!")
+    main()
+except Exception as e:
+    print(f"Failed to connect to MongoDB: {e}")

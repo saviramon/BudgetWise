@@ -546,7 +546,10 @@ def call_microserviceA(req):
 
 # Filters transactions by month, type, or ID
 def view_transactions_by_type():
+ 
     while True:
+        req = {"filter":"Send a filtered table"}
+        call_microserviceA(req)
         clear_screen()
         print("=== Quick Budget Summary ===")
         view_budget()
@@ -668,7 +671,7 @@ while True:
     title()
     main_menu()
     choice = input("\nEnter a number between 1 and 5: ")
-
+ 
     if choice == '1':
         while True:
             clear_screen()

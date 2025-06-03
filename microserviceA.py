@@ -53,6 +53,11 @@ while True:
     try:
         req = socket.recv_json()
 
+        if "filter" in req:
+            print(f"[Server] Received a request from the client: {req['filter']}")
+            socket.send_json({"status": "Server received your message!"})
+            continue
+    
         # ID lookup
         if "id" in req:
             try:

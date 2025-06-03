@@ -45,11 +45,11 @@ def apply_recurring_transactions():
     print(f"Applying recurring transactions for {today}")
     processed = []
 
-    for doc in recurring_col.find():
-        print(f"Checking doc: {doc}")
+    for trans in recurring_col.find():
+        print(f"Checking transaction: {trans}")
 
-        freq = doc.get("recurrence", {}).get("frequency")
-        next_due_str = doc.get("recurrence", {}).get("next_due")
+        freq = trans.get("recurrence", {}).get("frequency")
+        next_due_str = trans.get("recurrence", {}).get("next_due")
 
         print(f"Frequency: {freq}, Next Due: {next_due_str}")
 
@@ -68,8 +68,8 @@ def apply_recurring_transactions():
         if today >= next_due:
             print("Processing transaction")
 
-            amount = doc.get("amount", 0)
-            txn_type = doc.get("type")
+            amount = trans.get("amount", 0)
+            txn_type = trans.get("type")
             if not txn_type:
                 txn_type = "income" if amount > 0 else "expense"
 
@@ -82,8 +82,8 @@ def apply_recurring_transactions():
             transaction = {
                 "date": str(today),
                 "type": txn_type,
-                "description": doc.get("description", "no description"),
-                "category": doc.get("category", "uncategorized"),
+                "description": trans.get("description", "no description"),
+                "category": trans.get("category", "uncategorized"),
                 "amount": amount
             }
 
@@ -99,7 +99,7 @@ def apply_recurring_transactions():
             new_due_date = next_due + timedelta(days=delta_days)
             try:
                 update_result = recurring_col.update_one(
-                    {"_id": doc["_id"]},
+                    {"_id": trans["_id"]},
                     {"$set": {"recurrence.next_due": str(new_due_date)}}
                 )
                 print(f"Updated recurring transaction: {update_result.matched_count}, modified: {update_result.modified_count}")
@@ -125,8 +125,7 @@ while True:
                 recurring_col.insert_one(transaction)
                 processed = apply_recurring_transactions()
                 socket.send_json({
-                    "status": "ok",
-                    "processed_count": len(processed)
+                    "Transaction processed": len(processed)
                 })
             except Exception as e:
                 socket.send_json({"status": "error", "message": str(e)})
@@ -135,8 +134,7 @@ while True:
             try:
                 processed = apply_recurring_transactions()
                 socket.send_json({
-                    "status": "ok",
-                    "processed_count": len(processed)
+                    "Transaction(s) added": len(processed)
                 })
             except Exception as e:
                 socket.send_json({"status": "error", "message": str(e)})
@@ -144,5 +142,4 @@ while True:
         else:
             socket.send_json({"status": "error", "message": "Unknown command"})
     except Exception as e:
-        # In case of JSON decoding errors or others
         socket.send_json({"status": "error", "message": f"Server error: {str(e)}"})

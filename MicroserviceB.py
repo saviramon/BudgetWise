@@ -125,8 +125,8 @@ while True:
                 recurring_col.insert_one(transaction)
                 processed = apply_recurring_transactions()
                 socket.send_json({
-                    "status": "Recurring transaction added",
-                    "Transaction(s) added": len(processed)
+                    "status": "ok",
+                    "processed_count": len(processed)
                 })
             except Exception as e:
                 socket.send_json({"status": "error", "message": str(e)})
@@ -135,7 +135,7 @@ while True:
             try:
                 processed = apply_recurring_transactions()
                 socket.send_json({
-                    "status": "Recurring transaction added",
+                    "status": "ok",
                     "processed_count": len(processed)
                 })
             except Exception as e:
@@ -144,4 +144,5 @@ while True:
         else:
             socket.send_json({"status": "error", "message": "Unknown command"})
     except Exception as e:
+        # In case of JSON decoding errors or others
         socket.send_json({"status": "error", "message": f"Server error: {str(e)}"})

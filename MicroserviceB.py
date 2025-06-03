@@ -13,8 +13,8 @@ uri = os.getenv("MONGODB_URI")
 if not uri:
     raise ValueError("MONGODB_URI is not set in .env")
 
-# Connect to MongoDB with ServerApi version 1
-client = MongoClient(uri, server_api=ServerApi("1"))
+# Connect to MongoDB 
+client = MongoClient(uri)
 
 try:
     client.admin.command("ping")
@@ -74,7 +74,7 @@ def apply_recurring_transactions():
             if not txn_type:
                 txn_type = "income" if amount > 0 else "expense"
 
-            # If type is expense, ensure amount is negative
+            # Makes sure expense is negative and income is positive
             if txn_type == "expense" and amount > 0:
                 amount = -abs(amount)
             elif txn_type == "income" and amount < 0:
@@ -95,7 +95,7 @@ def apply_recurring_transactions():
                 print(f"Failed to insert transaction: {e}")
                 continue
 
-            # Update next_due
+            # Updates the next_due date based on frequency
             delta_days = FREQUENCY_TO_DAYS.get(freq, 30)
             new_due_date = next_due + timedelta(days=delta_days)
             try:

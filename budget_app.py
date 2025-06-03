@@ -589,7 +589,7 @@ def apply_recurring_transactions():
     """
     context = zmq.Context()
     socket = context.socket(zmq.REQ)
-    socket.connect("tcp://localhost:5557")  # Change if the server is on another machine
+    socket.connect("tcp://localhost:5557")
 
     # Send command to apply recurring transactions
     socket.send_json({"command": "apply_recurring"})
@@ -664,9 +664,7 @@ def create_graph_microserviceC():
 
     # Load and show the image using PIL
     image = Image.open(io.BytesIO(data))
-    image.show()  # Opens in default image viewer (or Preview/Photos)
-
-    print("Chart displayed.")
+    image.show()  # Opens image once it is received
 
 # MicroserviceD - view total savings and display in a table format
 def view_savings():
